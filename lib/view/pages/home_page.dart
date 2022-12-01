@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:tmdb_movie_app/controller/home_page_controller/now_playing_provider.dart';
+import 'package:tmdb_movie_app/controller/home_page_controller/popular_provider.dart';
+import 'package:tmdb_movie_app/controller/home_page_controller/top_rated_provider.dart';
+import 'package:tmdb_movie_app/controller/home_page_controller/up_coming_proivder.dart';
+import 'package:tmdb_movie_app/services/tmdb_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +17,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List menu = ['Alls','Films','Series','Animes','Documentaries'];
+
+  @override
+  void initState() {
+    TopRatedProvider topRatedProvider = Provider.of<TopRatedProvider>(context, listen:false);
+    topRatedProvider.getTopRatedData();
+
+    PopularProvider popularProvider = Provider.of<PopularProvider>(context, listen:false);
+    popularProvider.getPopularData();
+
+    NowPlayingProvider nowPlayingProvider = Provider.of<NowPlayingProvider>(context, listen:false);
+    nowPlayingProvider.getNowPlayingData();
+
+    UpComingProvider upComingProvider = Provider.of<UpComingProvider>(context, listen:false);
+    upComingProvider.getUpComingData();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,34 +115,46 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 2.h,),
                     Container(
                       alignment: Alignment.centerLeft,
-                      width: 40.w,
+                      width: 90.w,
                       height: 5.h,
                       //decoration: BoxDecoration(color: Colors.amber),
-                      child: Text('Films',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
+                      child: Text('Gelmiş Geçmiş En İyiler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
                   ],
                 ),
                 SizedBox(height: 1.h,),
-                Container(
-                  width: 100.w,
-                  height: 25.h,
-                  //decoration: const BoxDecoration(color: Colors.red),
-                  child: ListView.builder(
-                    //physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(5),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 8,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.only(left: 12),
-                        width: 40.w,
-                        height: 25.h,
-                        decoration: 
-                        BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.blue),
-                      );
-                    },),
+                Consumer(
+                  builder: (BuildContext context, TopRatedProvider value, Widget? child) { 
+                    return value.topRatedModel != null ? Container(
+                    width: 100.w,
+                    height: 25.h,
+                    //decoration: const BoxDecoration(color: Colors.red),
+                    child: ListView.builder(
+                      //physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(5),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: value.topRatedModel!.results!.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            // value.getIndex(index);
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 12),
+                            width: 40.w,
+                            height: 25.h,
+                            decoration: 
+                            BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.blue,
+                              image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.topRatedModel!.results![index].posterPath}'),fit: BoxFit.fill)
+                              ),
+                          ),
+                        );
+                      },),
+                  ) : const CircularProgressIndicator();
+                  },
+                  
                 ),
                 SizedBox(height: 1.h,),
                 Row(
@@ -128,34 +162,40 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 2.h,),
                     Container(
                       alignment: Alignment.centerLeft,
-                      width: 40.w,
+                      width: 60.w,
                       height: 5.h,
                       //decoration: BoxDecoration(color: Colors.amber),
-                      child: Text('Series',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
+                      child: Text('Popular Filmler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
                   ],
                 ),
                 SizedBox(height: 1.h,),
-                Container(
-                  width: 100.w,
-                  height: 25.h,
-                  //decoration: const BoxDecoration(color: Colors.red),
-                  child: ListView.builder(
-                    // physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(5),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 8,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.only(left: 12),
-                        width: 40.w,
-                        height: 25.h,
-                        decoration: 
-                        BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.blue),
-                      );
-                    },),
+                Consumer(
+                  builder: (BuildContext context, PopularProvider value, Widget? child) { 
+                    return value.popularModel != null ? Container(
+                    width: 100.w,
+                    height: 25.h,
+                    //decoration: const BoxDecoration(color: Colors.red),
+                    child: ListView.builder(
+                      // physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(5),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: value.popularModel!.results!.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.only(left: 12),
+                          width: 40.w,
+                          height: 25.h,
+                          decoration: 
+                          BoxDecoration(
+                            image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.popularModel!.results![index].posterPath}'),fit: BoxFit.fill),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.blue),
+                        );
+                      },),
+                  ) : CircularProgressIndicator();
+                   },
+                  
                 ),
                 SizedBox(height: 1.h,),
                 Row(
@@ -163,34 +203,40 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 2.h,),
                     Container(
                       alignment: Alignment.centerLeft,
-                      width: 40.w,
+                      width: 60.w,
                       height: 5.h,
                       //decoration: BoxDecoration(color: Colors.amber),
-                      child: Text('Animes',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
+                      child: Text('Vizyondakiler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
                   ],
                 ),
                 SizedBox(height: 1.h,),
-                Container(
-                  width: 100.w,
-                  height: 25.h,
-                  //decoration: const BoxDecoration(color: Colors.red),
-                  child: ListView.builder(
-                    // physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(5),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 8,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.only(left: 12),
-                        width: 40.w,
-                        height: 25.h,
-                        decoration: 
-                        BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.blue),
-                      );
-                    },),
+                Consumer(
+                  builder: (BuildContext context, NowPlayingProvider value, Widget? child) { 
+                    return value.nowPlayingModel != null ? Container(
+                    width: 100.w,
+                    height: 25.h,
+                    //decoration: const BoxDecoration(color: Colors.red),
+                    child: ListView.builder(
+                      // physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(5),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 8,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.only(left: 12),
+                          width: 40.w,
+                          height: 25.h,
+                          decoration: 
+                          BoxDecoration(
+                            image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.nowPlayingModel!.results![index].posterPath}'),fit: BoxFit.fill),
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.blue),
+                        );
+                      },),
+                  ) : CircularProgressIndicator();
+                  },
+                  
                 ),
                 SizedBox(height: 1.h,),
                 Row(
