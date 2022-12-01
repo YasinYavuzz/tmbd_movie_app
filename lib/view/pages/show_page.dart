@@ -1,19 +1,30 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:tmdb_movie_app/controller/on_board_page_controller/movie_detail_provider.dart';
+import 'package:tmdb_movie_app/controller/show_page_controller/show_page_acting_provider.dart';
+import 'package:tmdb_movie_app/view/pages/home_page.dart';
 
 class ShowPage extends StatefulWidget {
-  const ShowPage({super.key});
+  ShowPage({super.key, required this.movie_id});
+  final dynamic movie_id;
 
   @override
   State<ShowPage> createState() => _ShowPageState();
 }
 
 class _ShowPageState extends State<ShowPage> {
+
+  @override
+  void initState() {
+    MovieDetailProvider movieDetailProvider = Provider.of<MovieDetailProvider>(context, listen:false);
+    movieDetailProvider.getMovieDetailData(movie_id: widget.movie_id);
+
+    ShowPageActingProvider showPageActingProvider = Provider.of<ShowPageActingProvider>(context, listen:false);
+    showPageActingProvider.getShowPageActingData(movie_id: widget.movie_id);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,15 +33,20 @@ class _ShowPageState extends State<ShowPage> {
         child: Stack(
           children: [
            
-            Container(
-              alignment: Alignment.bottomCenter,
-              width: 100.w,
-              height: 45.h,
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/imperdoavel.png'),
-                      fit: BoxFit.cover),
-                  color: Colors.amber),
+            Consumer(
+              builder: (BuildContext context, ShowPageActingProvider value, Widget? child) { 
+                return value.showPageActingModel != null ? Container(
+                alignment: Alignment.bottomCenter,
+                width: 100.w,
+                height: 45.h,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.showPageActingModel!.cast![0].profilePath}'),
+                        fit: BoxFit.cover),
+                    color: Colors.amber),
+              ) : CircularProgressIndicator();
+              },
+              
             ),
             Column(
               children: [
@@ -43,7 +59,7 @@ class _ShowPageState extends State<ShowPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(onPressed: () {
-                          
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
                         }, icon: Icon(Icons.arrow_back,size: 4.h,color: Colors.white,)),
                         IconButton(onPressed: () {
                           
@@ -81,89 +97,84 @@ class _ShowPageState extends State<ShowPage> {
                   decoration: BoxDecoration(
                       //color: Colors.red
                       ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(right: 1.h),
-                        padding: EdgeInsets.all(6),
-                        width: 10.h,
-                        height: 10.h,
-                        //color: Colors.blue,
-                        child: CircularPercentIndicator(
-                          circularStrokeCap: CircularStrokeCap.round,
-                          backgroundColor: const Color(0xff303243),
-                          radius: 32.0,
-                          lineWidth: 8.0,
-                          percent: 0.45,
-                          center: const Center(
-                              child: Text(
-                            "45%",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w500),
-                          )),
-                          progressColor: const Color(0xffFF1F8A),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(top: 1.3.h),
-                        width: 25.h,
-                        height: 10.h,
-                        //color: Colors.amber,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                alignment: Alignment.center,
-                                //color: Colors.green,
+                  child: Consumer(
+                    builder: (BuildContext context, MovieDetailProvider value, Widget? child) { 
+                      return Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(right: 1.h),
+                          padding: EdgeInsets.all(6),
+                          width: 10.h,
+                          height: 10.h,
+                          //color: Colors.blue,
+                          child: CircularPercentIndicator(
+                            circularStrokeCap: CircularStrokeCap.round,
+                            backgroundColor: const Color(0xff303243),
+                            radius: 32.0,
+                            lineWidth: 8.0,
+                            percent: (value.movieDetailModel!.voteAverage * 10)/100,
+                            center: Center(
                                 child: Text(
-                                  'Imperdoavel (2021)',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w800),
+                              "${((value.movieDetailModel!.voteAverage * 10)).toString().split('.').first}%",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500),
+                            )),
+                            progressColor: const Color(0xffFF1F8A),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(top: 1.3.h),
+                          width: 27.h,
+                          height: 10.h,
+                          //color: Colors.amber,
+                          child: Column(
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  //color: Colors.green,
+                                  child: Text(
+                                    '${value.movieDetailModel!.originalTitle!.length > 15 ? value.movieDetailModel!.originalTitle!.substring(0,15) : value.movieDetailModel!.originalTitle!} (${value.movieDetailModel!.releaseDate.toString().split("-").first})',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800),
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    //alignment: Alignment.center,
-                                    child: Text(
-                                      ' 10/12/21 (BR)',
-                                      style: TextStyle(
-                                          color: Color(0xffBBBBBB),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        '${value.movieDetailModel!.releaseDate.toString().split("-")[2]}/${value.movieDetailModel!.releaseDate.toString().split("-")[1]}/${value.movieDetailModel!.releaseDate.toString().split("-")[0]} (${value.movieDetailModel!.productionCompanies![0].originCountry})',
+                                        style: TextStyle(
+                                            color: Color(0xffBBBBBB),
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      //color: Colors.orange,
                                     ),
-                                    //color: Colors.orange,
-                                  ),
-                                  Text(' - ',
-                                      style: TextStyle(
-                                          color: Color(0xffBBBBBB),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400)),
-                                  Image.asset('assets/ic_clock.png'),
-                                  Text(' 1h 53m',
-                                      style: TextStyle(
-                                          color: Color(0xffBBBBBB),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400))
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
+                                    
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    );
+                    },
+                    
                   ),
                 ),
                 SizedBox(
@@ -178,20 +189,25 @@ class _ShowPageState extends State<ShowPage> {
                 SizedBox(
                   height: 1.h,
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 0.2.h),
-                  width: 80.w,
-                  height: 16.5.h,
-                  //color: Colors.red,
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Após cumprir pena por um crime violento, Ruth volta ao convívio na sociedade, que se recusa a perdoar seu passado. Discriminada no lugar que já chamou de lar, sua única esperança é encontrar a irmã, que ela havia sido forçada a deixar para trás.',
-                    style: TextStyle(
-                      color: Color(0xffCCCCCC),
-                      fontSize: 16,
+                Consumer(
+                  builder: (BuildContext context, MovieDetailProvider value, Widget? child) { 
+                    return Container(
+                    padding: EdgeInsets.only(left: 0.2.h),
+                    width: 80.w,
+                    height: 16.5.h,
+                    //color: Colors.red,
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${value.movieDetailModel!.overview}',
+                      style: TextStyle(
+                        color: Color(0xffCCCCCC),
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.left,
                     ),
-                    textAlign: TextAlign.left,
-                  ),
+                  );
+                   },
+                  
                 ),
                 SizedBox(
                   height: 3.h,
@@ -239,77 +255,53 @@ class _ShowPageState extends State<ShowPage> {
                     child: Text('Artists',style:TextStyle(color: Colors.white,fontSize: 5.h)),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 3.h,vertical: 1.h),
-                  width: 100.w,height: 18.h,
-                  child: ListView.builder(
-                    //padding: EdgeInsets.all(0),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 8,
-                    itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.only(right: 1.h),
-                      width: 22.w,
-                      //height: 10.h,
-                      //color: Colors.amber,
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 10.h,
-                            height: 10.h,
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                              border: Border.all(width: 0.7.h,color: const Color(0xff303243)),
-                              image: const DecorationImage(image: NetworkImage('https://upload.wikimedia.org/wikipedia/commons/d/da/Sandra_Bullock%2C_The_Heat%2C_London%2C_2013_%28crop%29.jpg'),fit: BoxFit.cover)
-                            ),            
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: 100.w,
-                            height: 6.h,
-                            //color: Colors.deepOrangeAccent,
-                            child: const Text('Sandra\nBullock',style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.w700),),
-                          )
-                        ],
-                      ),
-                    );
-                  },) 
+                Consumer(
+                  builder: (BuildContext context, ShowPageActingProvider value, Widget? child) { 
+                    return value.showPageActingModel != null ? Container(
+                    padding: EdgeInsets.symmetric(horizontal: 3.h,vertical: 1.h),
+                    width: 100.w,height: 18.h,
+                    child: ListView.builder(
+                      //padding: EdgeInsets.all(0),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                      return Container(
+                        margin: EdgeInsets.only(right: 1.h),
+                        width: 23.w,
+                        //height: 10.h,
+                        //color: Colors.amber,
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 10.h,
+                              height: 10.h,
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                                border: Border.all(width: 0.7.h,color: const Color(0xff303243)),
+                                image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.showPageActingModel!.cast![index].profilePath}'),fit: BoxFit.cover)
+                              ),            
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              width: 100.w,
+                              height: 6.h,
+                              //color: Colors.deepOrangeAccent,
+                              child: Text('${value.showPageActingModel!.cast![index].name.toString().split(" ").first}\n${value.showPageActingModel!.cast![index].name.toString().split(" ").last}',style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.w700),),
+                            )
+                          ],
+                        ),
+                      );
+                    },) 
+                  
+                  ) : CircularProgressIndicator();
+                   },
+                  
+                ),
+                SizedBox(height: 2.h,),
                 
-                ),
-                SizedBox(height: 1.h,),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.only(left: 5.h),
-                    width: 50.w,
-                    height: 6.h,
-                    //color: Colors.blue,
-                    child: Text('Categories',style:TextStyle(color: Colors.white,fontSize: 5.h)),
-                  ),
-                ),
-                SizedBox(height: .2.h,),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5.h,vertical: 1.h),
-                  width: 100.w,
-                  height: 7.h,
-                  //color: Colors.red,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 2,
-                    itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.only(right: 1.5.h),
-                      width: 27.w,
-                      decoration: BoxDecoration(
-                        color: Color(0xff303243),
-                        borderRadius: BorderRadius.circular(25)),
-                      child: Center(child: Text('Drama',style:TextStyle(color: Colors.white,fontSize: 2.h))),
-                    );
-                  },),
-                ),
-                SizedBox(height: 2.h,)
+                
+                
               ],
             ),
           ],

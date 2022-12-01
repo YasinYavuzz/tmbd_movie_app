@@ -6,7 +6,9 @@ import 'package:tmdb_movie_app/controller/home_page_controller/now_playing_provi
 import 'package:tmdb_movie_app/controller/home_page_controller/popular_provider.dart';
 import 'package:tmdb_movie_app/controller/home_page_controller/top_rated_provider.dart';
 import 'package:tmdb_movie_app/controller/home_page_controller/up_coming_proivder.dart';
-import 'package:tmdb_movie_app/services/tmdb_service.dart';
+import 'package:tmdb_movie_app/controller/main_controller/change_page.dart';
+import 'package:tmdb_movie_app/controller/on_board_page_controller/movie_detail_provider.dart';
+import 'package:tmdb_movie_app/view/pages/on_board_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +18,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List menu = ['Alls','Films','Series','Animes','Documentaries'];
+  List menu = ['Alls','En İyiler','Populer','Vizyondakiler','Yeni Filmler'];
+  MovieDetailProvider? movieDetailProvider = MovieDetailProvider();
 
   @override
   void initState() {
@@ -88,26 +91,37 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 5.h,),
-                Container(
-                  width: 100.w,
-                  height: 7.h,
-                  // decoration: const BoxDecoration(color: Colors.red),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(5),
-                    itemCount: 5,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        alignment: Alignment.center,
-                        margin: const EdgeInsets.only(left: 12),
-                        width: 35.w,
-                        height: 2.h,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: index == 0 ?Color(0xffFF1F8A) : Color(0xff8000FF).withOpacity(0)),
-                          child: Text('${menu[index]}',style: GoogleFonts.inter(color: index == 0 ?Colors.white : Colors.grey,fontSize:18)),
-                      );
-                    },),
+                Consumer(
+                  builder: (BuildContext context, ChangePageIndexProvider value, Widget? child) { 
+                    return Container(
+                    width: 100.w,
+                    height: 7.h,
+                    // decoration: const BoxDecoration(color: Colors.red),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(5),
+                      itemCount: 5,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            value.getHomeChangePageIndex(index);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => value.getHomeChangePage()));
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.only(left: 12),
+                            width: 35.w,
+                            height: 2.h,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              color: index == value.home_index ?Color(0xffFF1F8A) : Color(0xff8000FF).withOpacity(0)),
+                              child: Text('${menu[index]}',style: GoogleFonts.inter(color: index == value.home_index ?Colors.white : Colors.grey,fontSize:18)),
+                          ),
+                        );
+                      },),
+                  );
+                   },
+                   
                 ),
                 SizedBox(height: 3.h,),
                 Row(
@@ -118,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                       width: 90.w,
                       height: 5.h,
                       //decoration: BoxDecoration(color: Colors.amber),
-                      child: Text('Gelmiş Geçmiş En İyiler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
+                      child: Text('Gelmiş Geçmiş En İyi Filmler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
                   ],
                 ),
                 SizedBox(height: 1.h,),
@@ -137,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onTap: () {
-                            // value.getIndex(index);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => OnBoardPage(movie_id: value.topRatedModel!.results![index].id,),));
                           },
                           child: Container(
                             margin: const EdgeInsets.only(left: 12),
@@ -165,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                       width: 60.w,
                       height: 5.h,
                       //decoration: BoxDecoration(color: Colors.amber),
-                      child: Text('Popular Filmler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
+                      child: Text('Populer Filmler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
                   ],
                 ),
                 SizedBox(height: 1.h,),
@@ -182,15 +196,20 @@ class _HomePageState extends State<HomePage> {
                       scrollDirection: Axis.horizontal,
                       itemCount: value.popularModel!.results!.length,
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.only(left: 12),
-                          width: 40.w,
-                          height: 25.h,
-                          decoration: 
-                          BoxDecoration(
-                            image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.popularModel!.results![index].posterPath}'),fit: BoxFit.fill),
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.blue),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => OnBoardPage(movie_id: value.popularModel!.results![index].id,),));
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 12),
+                            width: 40.w,
+                            height: 25.h,
+                            decoration: 
+                            BoxDecoration(
+                              image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.popularModel!.results![index].posterPath}'),fit: BoxFit.fill),
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.blue),
+                          ),
                         );
                       },),
                   ) : CircularProgressIndicator();
@@ -223,15 +242,20 @@ class _HomePageState extends State<HomePage> {
                       scrollDirection: Axis.horizontal,
                       itemCount: 8,
                       itemBuilder: (context, index) {
-                        return Container(
-                          margin: const EdgeInsets.only(left: 12),
-                          width: 40.w,
-                          height: 25.h,
-                          decoration: 
-                          BoxDecoration(
-                            image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.nowPlayingModel!.results![index].posterPath}'),fit: BoxFit.fill),
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.blue),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => OnBoardPage(movie_id: value.nowPlayingModel!.results![index].id,),));
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 12),
+                            width: 40.w,
+                            height: 25.h,
+                            decoration: 
+                            BoxDecoration(
+                              image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.nowPlayingModel!.results![index].posterPath}'),fit: BoxFit.fill),
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.blue),
+                          ),
                         );
                       },),
                   ) : CircularProgressIndicator();
@@ -244,34 +268,45 @@ class _HomePageState extends State<HomePage> {
                     SizedBox(width: 2.h,),
                     Container(
                       alignment: Alignment.centerLeft,
-                      width: 48.w,
+                      width: 60.w,
                       height: 5.h,
                       //decoration: BoxDecoration(color: Colors.amber),
-                      child: Text('Documentaries',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
+                      child: Text('Vizyona Girecekler',style: GoogleFonts.inter(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold),),)
                   ],
                 ),
                 SizedBox(height: 1.h,),
-                Container(
-                  width: 100.w,
-                  height: 25.h,
-                  //decoration: const BoxDecoration(color: Colors.red),
-                  child: ListView.builder(
-                    //physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.all(5),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 8,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.only(left: 12),
-                        width: 40.w,
-                        height: 25.h,
-                        decoration: 
-                        BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.blue),
-                      );
-                    },),
+                Consumer(
+                  builder: (BuildContext context, UpComingProvider value, Widget? child) { 
+                    return value.upComingModel != null ? Container(
+                    width: 100.w,
+                    height: 25.h,
+                    //decoration: const BoxDecoration(color: Colors.red),
+                    child: ListView.builder(
+                      //physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(5),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: value.upComingModel!.results!.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => OnBoardPage(movie_id: value.upComingModel!.results![index].id,),));
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 12),
+                            width: 40.w,
+                            height: 25.h,
+                            decoration: 
+                            BoxDecoration(
+                              image: DecorationImage(image: NetworkImage('https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.upComingModel!.results![index].posterPath}'),fit: BoxFit.fill),
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.blue),
+                          ),
+                        );
+                      },),
+                  ): CircularProgressIndicator();
+                   },
+                  
                 ),
                 SizedBox(height: 2.h,),
               ],
