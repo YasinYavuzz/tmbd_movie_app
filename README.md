@@ -1,3 +1,4 @@
+![tmdb_movie_app](https://user-images.githubusercontent.com/99301596/205317355-32b0dbd8-761b-46d3-b227-c4ea91b28d01.gif)
 # tmdb_movie_app
 
 A new Flutter project.
