@@ -9,11 +9,8 @@ import 'package:tmdb_movie_app/controller/main_controller/change_page.dart';
 import 'package:tmdb_movie_app/controller/on_board_page_controller/movie_detail_provider.dart';
 import 'package:tmdb_movie_app/controller/search_page_controller/search_page_provider.dart';
 import 'package:tmdb_movie_app/controller/show_page_controller/show_page_acting_provider.dart';
-import 'package:tmdb_movie_app/view/pages/best_movies.dart';
 import 'view/pages/home_page.dart';
-import 'view/pages/popular_movies.dart';
-import 'view/pages/search_page.dart';
-import 'view/shimmer_pages/shimmer_search_page.dart';
+
 
 void main(){
   runApp(const MyApp());
@@ -38,7 +35,7 @@ class MyApp extends StatelessWidget {
           ],
           child: const MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: PopularMovies()
+          home: HomePage()
           ),
         );
       },

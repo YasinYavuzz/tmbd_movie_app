@@ -147,5 +147,32 @@ Future<PopularModel?> getPopularModelWithPage ({required int page}) async {
   return null;
 }
 
+Future<NowPlayingModel?> getNowPlayingModelWithPage ({required int page}) async {
+  try {
+    NowPlayingModel nowPlayingModel;
+    final response = await _dio.get('now_playing?api_key=51323e803b6016405fd167d04ea5097c&language=en-US&page=$page');
+    nowPlayingModel = NowPlayingModel.fromJson(response.data);
+    print(response.data);
+    return nowPlayingModel;
+  } catch (e) {
+    print(e);
+  }
+  return null;
+}
+
+Future<UpComingModel?> getUpComingModelWithPage ({required int page}) async {
+  try {
+    UpComingModel upComingModel;
+    final response = await _dio.get('upcoming?api_key=51323e803b6016405fd167d04ea5097c&language=tr-TR&page=$page');
+    upComingModel = UpComingModel.fromJson(response.data);
+    print(response.data);
+    return upComingModel;
+  } catch (e) {
+    print(e);
+  }
+  return null;
+}
+
+
 
 

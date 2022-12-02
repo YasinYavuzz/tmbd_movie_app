@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:tmdb_movie_app/controller/main_controller/change_page.dart';
 
+import '../shimmer_pages/shimmer_movies_pages.dart';
+import 'home_page.dart';
+
 class PopularMovies extends StatefulWidget {
   const PopularMovies({super.key});
 
@@ -42,12 +45,32 @@ class _PopularMoviesState extends State<PopularMovies> {
                   width: 100.w,
                   height: 8.h,
                   //color: Colors.red,
-                  child: const Center(
-                      child: Text('Popüler Filmler',
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                          onTap: () {
+                            value.getHomeChangePageIndex(0);
+                            value.getPageReset(0);
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.only(left: 3.h,right: 6.h),
+                          width: 9.w,
+                          height: 9.h,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.red
+                          ),
+                          child: Center(child: Icon(Icons.arrow_back,color: Colors.white,)),
+                                              ),
+                        ),
+                      Text('Popüler Filmler',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 25,
-                              fontWeight: FontWeight.bold))),
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(
@@ -63,16 +86,19 @@ class _PopularMoviesState extends State<PopularMovies> {
                   itemCount: 8,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 1.4,
+                      childAspectRatio: 1.0,
                       crossAxisSpacing: 1.0.h,
                       mainAxisSpacing: 1.0.h),
                   itemBuilder: (context, index) {
-                    return Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: NetworkImage(
-                                  'https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.popularModel!.results![index].posterPath}'),
-                              fit: BoxFit.fill)
+                    return Padding(
+                      padding: EdgeInsets.all(2),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: NetworkImage(
+                                    'https://image.tmdb.org/t/p/w600_and_h900_bestv2/${value.popularModel!.results![index].posterPath}'),
+                                fit: BoxFit.fill)
+                        ),
                       ),
                     );
                   },
@@ -114,7 +140,7 @@ class _PopularMoviesState extends State<PopularMovies> {
                    
               )
             ]),
-                 ) : CircularProgressIndicator();
+                 ) : const ShimmerMoviesPages();
            },
            
          ),
