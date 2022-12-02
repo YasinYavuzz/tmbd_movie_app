@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:tmdb_movie_app/controller/on_board_page_controller/movie_detail_provider.dart';
 import 'package:tmdb_movie_app/view/pages/show_page.dart';
+import 'package:tmdb_movie_app/view/shimmer_pages/shimmer_on_page.dart';
 
 class OnBoardPage extends StatefulWidget {
   OnBoardPage({super.key,required this.movie_id});
@@ -117,7 +118,7 @@ class _OnBoardPageState extends State<OnBoardPage> {
               ),
             ),
           ],
-        ) : CircularProgressIndicator();
+        ) : const ShimmerOnPage();
 
         },
         

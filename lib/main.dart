@@ -7,10 +7,13 @@ import 'package:tmdb_movie_app/controller/home_page_controller/top_rated_provide
 import 'package:tmdb_movie_app/controller/home_page_controller/up_coming_proivder.dart';
 import 'package:tmdb_movie_app/controller/main_controller/change_page.dart';
 import 'package:tmdb_movie_app/controller/on_board_page_controller/movie_detail_provider.dart';
+import 'package:tmdb_movie_app/controller/search_page_controller/search_page_provider.dart';
 import 'package:tmdb_movie_app/controller/show_page_controller/show_page_acting_provider.dart';
-import 'package:tmdb_movie_app/model/on_board_page_model/movie_detail_model.dart';
-import 'package:tmdb_movie_app/view/pages/on_board_page.dart';
+import 'package:tmdb_movie_app/view/pages/best_movies.dart';
 import 'view/pages/home_page.dart';
+import 'view/pages/popular_movies.dart';
+import 'view/pages/search_page.dart';
+import 'view/shimmer_pages/shimmer_search_page.dart';
 
 void main(){
   runApp(const MyApp());
@@ -30,12 +33,13 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider<UpComingProvider>(create: (context) => UpComingProvider()),
             ChangeNotifierProvider<ChangePageIndexProvider>(create: (context) => ChangePageIndexProvider()),
             ChangeNotifierProvider<MovieDetailProvider>(create: (context) => MovieDetailProvider()),
-            ChangeNotifierProvider<ShowPageActingProvider>(create: (context) => ShowPageActingProvider())
+            ChangeNotifierProvider<ShowPageActingProvider>(create: (context) => ShowPageActingProvider()),
+            ChangeNotifierProvider<SearchPageProvider>(create: (context) => SearchPageProvider())
           ],
           child: const MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: HomePage(),
-              ),
+          home: PopularMovies()
+          ),
         );
       },
       

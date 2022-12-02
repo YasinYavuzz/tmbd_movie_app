@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:tmdb_movie_app/controller/home_page_controller/top_rated_provider.dart';
 import 'package:tmdb_movie_app/controller/main_controller/change_page.dart';
 
 class BestMovies extends StatefulWidget {
@@ -12,14 +11,21 @@ class BestMovies extends StatefulWidget {
 }
 
 class _BestMoviesState extends State<BestMovies> {
+
   
+  @override
+  void initState() {
+    ChangePageIndexProvider changePageIndexProvider = Provider.of<ChangePageIndexProvider>(context, listen:false);
+    changePageIndexProvider.getTopRatedDataWithPage();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       //backgroundColor: Color(0xff21222E),
       body: Consumer(
-        builder: (BuildContext context, TopRatedProvider value, Widget? child) { 
-          return Container(
+        builder: (BuildContext context, ChangePageIndexProvider value, Widget? child) { 
+          return value.topRatedModel != null ? Container(
           width: 100.w,
           height: 100.h,
           decoration: const BoxDecoration(
@@ -83,16 +89,17 @@ class _BestMoviesState extends State<BestMovies> {
                   children: [
                     GestureDetector(
                         onTap: (){
-                          // Navigator.pop(context);
+                          value.getTopRatedPageDecrement();
                         },
                         child: Icon(
                           Icons.arrow_back_ios_new_sharp,
                           color: Colors.white,
                           size: 6.h,
                         )),
+                    Text('${value.page}',style: TextStyle(color: Colors.white,fontSize: 5.h),),
                     GestureDetector(
                       onTap: () {
-                        
+                        value.getTopRatedPageIncrement();
                       },
                       child: Icon(
                         Icons.arrow_forward_ios,
@@ -107,7 +114,7 @@ class _BestMoviesState extends State<BestMovies> {
               ),
             )
           ]),
-        );
+        ) : CircularProgressIndicator();
         },
         
       ),
