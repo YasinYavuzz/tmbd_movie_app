@@ -27,8 +27,8 @@ class ChangePageIndexProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  getPageReset(reset) {
-    page = reset;
+  getPageReset(index) {
+    page = 1;
     notifyListeners();
   }
 

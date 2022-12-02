@@ -49,7 +49,7 @@ class _UpComingState extends State<UpComing> {
                           GestureDetector(
                           onTap: () {
                             value.getHomeChangePageIndex(0);
-                            value.getPageReset(0);
+                            value.getPageReset(1);
                             Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
                           },
                           child: Container(

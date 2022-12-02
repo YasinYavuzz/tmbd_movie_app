@@ -50,7 +50,7 @@ class _PopularMoviesState extends State<PopularMovies> {
                       GestureDetector(
                           onTap: () {
                             value.getHomeChangePageIndex(0);
-                            value.getPageReset(0);
+                            value.getPageReset(1);
                             Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
                           },
                           child: Container(
